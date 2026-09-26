@@ -6,7 +6,28 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file is empty and serves only the purpose of making CMake happy because
-// you can't define a target with no sources.
+// LLVMSharp's generated InitializeAll* methods only include stable upstream
+// targets. Xtensa is experimental in LLVM 21, so register it when the native
+// library is loaded without requiring a managed-code special case.
 //
 //===----------------------------------------------------------------------===//
+
+extern "C" void LLVMInitializeXtensaTargetInfo();
+extern "C" void LLVMInitializeXtensaTarget();
+extern "C" void LLVMInitializeXtensaTargetMC();
+extern "C" void LLVMInitializeXtensaAsmParser();
+extern "C" void LLVMInitializeXtensaAsmPrinter();
+
+namespace {
+struct InitializeXtensa {
+  InitializeXtensa() {
+    LLVMInitializeXtensaTargetInfo();
+    LLVMInitializeXtensaTarget();
+    LLVMInitializeXtensaTargetMC();
+    LLVMInitializeXtensaAsmParser();
+    LLVMInitializeXtensaAsmPrinter();
+  }
+};
+
+InitializeXtensa initializeXtensa;
+} // namespace

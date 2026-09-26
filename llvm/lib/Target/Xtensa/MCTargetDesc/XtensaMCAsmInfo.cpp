@@ -28,7 +28,7 @@ XtensaMCAsmInfo::XtensaMCAsmInfo(const Triple &TT) {
   GlobalDirective = "\t.global\t";
   UsesELFSectionDirectiveForBSS = true;
   SupportsDebugInformation = true;
-  ExceptionsType = ExceptionHandling::DwarfCFI;
+  ExceptionsType = ExceptionHandling::None;
   AlignmentIsInBytes = false;
 }
 

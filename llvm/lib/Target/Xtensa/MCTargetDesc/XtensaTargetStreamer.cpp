@@ -52,6 +52,12 @@ XtensaTargetAsmStreamer::XtensaTargetAsmStreamer(MCStreamer &S,
 
 void XtensaTargetAsmStreamer::emitLiteral(MCSymbol *LblSym, const MCExpr *Value,
                                           bool SwitchLiteralSection, SMLoc L) {
+  if (!SwitchLiteralSection) {
+    getStreamer().emitLabel(LblSym, L);
+    getStreamer().emitValue(Value, 4, L);
+    return;
+  }
+
   SmallString<60> Str;
   raw_svector_ostream LiteralStr(Str);
 
@@ -74,7 +80,8 @@ void XtensaTargetAsmStreamer::emitLiteralPosition() {
 }
 
 void XtensaTargetAsmStreamer::startLiteralSection(MCSection *BaseSection) {
-  emitLiteralPosition();
+  getStreamer().switchSection(BaseSection);
+  getStreamer().emitValueToAlignment(Align(4));
 }
 
 XtensaTargetELFStreamer::XtensaTargetELFStreamer(MCStreamer &S)
@@ -112,6 +119,7 @@ void XtensaTargetELFStreamer::startLiteralSection(MCSection *BaseSection) {
       SectionName, ELF::SHT_PROGBITS, ELF::SHF_EXECINSTR | ELF::SHF_ALLOC);
 
   ConstSection->setAlignment(Align(4));
+  getStreamer().switchSection(ConstSection);
 }
 
 MCELFStreamer &XtensaTargetELFStreamer::getStreamer() {

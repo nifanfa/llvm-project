@@ -200,10 +200,14 @@ LLVMTargetMachineRef
 LLVMCreateTargetMachineWithOptions(LLVMTargetRef T, const char *TripleStr,
                                    LLVMTargetMachineOptionsRef Options) {
   auto *Opt = unwrap(Options);
+  Triple TargetTriple(TripleStr);
+  auto RM = Opt->RM;
+  if (TargetTriple.getArch() == Triple::xtensa && RM == Reloc::PIC_)
+    RM = Reloc::Static;
   TargetOptions TO;
   TO.MCOptions.ABIName = Opt->ABI;
-  return wrap(unwrap(T)->createTargetMachine(Triple(TripleStr), Opt->CPU,
-                                             Opt->Features, TO, Opt->RM,
+  return wrap(unwrap(T)->createTargetMachine(TargetTriple, Opt->CPU,
+                                             Opt->Features, TO, RM,
                                              Opt->CM, Opt->OL, Opt->JIT));
 }
 
